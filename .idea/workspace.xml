@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d86e1895-f076-4b5d-a404-eef9e8f60d16" name="Default Changelist" comment="" />
+    <list default="true" id="d86e1895-f076-4b5d-a404-eef9e8f60d16" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,6 +29,9 @@
     <findStrings>
       <find>user</find>
     </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -88,12 +93,14 @@
     <option name="width" value="1400" />
     <option name="height" value="990" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -101,21 +108,10 @@
               <item name="flowabledemo" type="b2602c69:ProjectViewProjectNode" />
               <item name="flowabledemo" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="flowabledemo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flowabledemo" type="462c0819:PsiDirectoryNode" />
-              <item name="Darkdown资料" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flowabledemo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flowabledemo" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -194,16 +190,25 @@
       <workItem from="1607590286060" duration="3972000" />
       <workItem from="1607600495050" duration="9319000" />
       <workItem from="1607646639053" duration="18961000" />
+      <workItem from="1607686355462" duration="368000" />
     </task>
+    <task id="LOCAL-00001" summary="Flowable+SpringBoot-请假流程">
+      <created>1607686486138</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1607686486138</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="32252000" />
+    <option name="totallyTimeSpent" value="32620000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25670242" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2600536" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Web" order="2" side_tool="true" />
       <window_info id="Designer" order="3" />
@@ -268,30 +273,19 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Flowable+SpringBoot-请假流程" />
+    <option name="LAST_COMMIT_MESSAGE" value="Flowable+SpringBoot-请假流程" />
+  </component>
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/service.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/config/Config.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/config/Config.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/service/FlowableService.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/controller/FlowableController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="594">
-          <caret line="66" selection-start-line="66" selection-end-line="66" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/controller/FlowableController.java" />
     <entry file="jar://$PROJECT_DIR$/../../repository_boot/org/flowable/flowable-engine/6.4.0/flowable-engine-6.4.0.jar!/org/flowable/engine/delegate/JavaDelegate.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
@@ -299,39 +293,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/CallExternalSystemDelegate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="4" column="39" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="39" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/service/impl/FlowServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/service/IFlowService.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/service/FlowBusinessService.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/controller/WorkController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="618">
-          <caret line="64" column="29" selection-start-line="64" selection-start-column="29" selection-end-line="64" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/service/impl/FlowBusinessServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="52" column="13" selection-start-line="52" selection-start-column="13" selection-end-line="52" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/CallExternalSystemDelegate.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/service/impl/FlowServiceImpl.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/service/IFlowService.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/service/FlowBusinessService.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/controller/WorkController.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/service/impl/FlowBusinessServiceImpl.java" />
     <entry file="file://$PROJECT_DIR$/src/main/resources/application.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -377,16 +344,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/handerler/BossTaskHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="13" selection-end-column="1" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/flowable/handerler/BossTaskHandler.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/com/haiyang/flowable/RepairApp.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
