@@ -1,0 +1,11 @@
+#数据源配置
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.23.129:3306/repair?characterEncoding=UTF-8
+    username: root
+    password: 1123
+
+#flowable配置
+#自动部署验证设置:true-开启（默认）、false-关闭
+flowable:
+  check-process-definitions: false
