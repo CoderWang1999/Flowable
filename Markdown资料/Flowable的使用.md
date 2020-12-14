@@ -75,6 +75,36 @@ public class RepairApp {
 
 ![1607604677406](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607604677406.png)
 
+#### 4.1对表的分类：
+
+      ##### 清单：
+
+![1607919971843](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607919971843.png)
+
+##### 通用数据表：
+
+![1607920031129](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607920031129.png)
+
+##### 流程定义存储表
+
+![1607920604362](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607920604362.png)
+
+##### 身份数据表：
+
+![1607920658590](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607920658590.png)
+
+##### 运行时流程数据表
+
+![1607920710333](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607920710333.png)
+
+##### 历史流程数据表
+
+![1607920744797](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607920744797.png)
+
+
+
+
+
 ### 5.设计流程图(http://47.94.16.7:9999/index.html#/processes)：保存并导出
 
 ![1607656764506](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607656764506.png)
@@ -206,182 +236,509 @@ public class RepairApp {
 
 
 
-### 7.实现controller层：
+### 7.实现controller层和service层
+
+#### 7.1**部署流程**
+
+service层：
 
 ```java
-package com.haiyang.flowable.controller;
-
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
-import org.flowable.engine.repository.Deployment;
-import org.flowable.engine.repository.DeploymentBuilder;
-import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.repository.ProcessDefinitionQuery;
-import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.task.api.Task;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.HashMap;
-import java.util.List;
-
-@Controller
-@RequestMapping(value = "leave")
-public class LeaveController {
-    @Autowired
-    private RuntimeService runtimeService;
-    @Autowired
-    private TaskService taskService;
-    @Autowired
-    private RepositoryService repositoryService;
-    @Autowired
-    private ProcessEngine processEngine;
-
-    /**
-     * 添加请假
-     *
-     * @param userId    用户Id
-     * @param day     请假天数
-     * @param descption 描述
+/**
+     * 部署流程
+     * filePath 文件路径 name 流程名字
      */
-    @RequestMapping(value = "add")
-    @ResponseBody
-    public String addLeave(String userId, Integer day, String descption) {
-        String filePath = "processes/leave.bpmn20.xml";
-        String name = "leave";
-        DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
-                .addClasspathResource(filePath).name(name);
-        Deployment deployment = deploymentBuilder.deploy();
-        //acr_re_deployment表的id
-        String id = deployment.getId();
-
-        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
-        //搜索条件deploymentId
-        query.deploymentId(id);
-        //最新版本过滤
-        query.latestVersion();
-        //查询
-        ProcessDefinition definition = query.singleResult();
-        //act_re_procdef表的key
-        String key = definition.getKey();
-        //启动流程
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("taskUser", userId);
-        map.put("day", day);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(key, map);
-        return "提交成功.流程Id为：" + processInstance.getId();
-    }
-
-
-    /**
-     * 获取taskId
-     * @param userId
-     * @return
-     */
-    public String getTaskId(String userId) {
-        List<Task> tasks = taskService.createTaskQuery().taskAssignee(userId).orderByTaskCreateTime().desc().list();
+    public Map<String, Object> deploymentFlow(String filePath, String name) {
         try {
-            String id = tasks.get(tasks.size() - 1).getId();
-            return id;
-        }catch (ArrayIndexOutOfBoundsException e){
-            e.printStackTrace();
-            return "此申请已通过或已驳回！";
+            DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
+                    .addClasspathResource(filePath).name(name);
+            Deployment deployment = deploymentBuilder.deploy();
+            logger.info("成功：部署工作流程：" + filePath);
+            logger.error("deployment.getKey():" + deployment.getKey());
+            logger.error("deployment.getName():" + deployment.getName());
+            //acr_re_deployment表的id
+            String id = deployment.getId();
+
+            ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+            //搜索条件deploymentId
+            query.deploymentId(id);
+            //最新版本过滤
+            query.latestVersion();
+            //查询
+            ProcessDefinition definition = query.singleResult();
+            //act_re_procdef表的key
+            String key = definition.getKey();
+            System.out.println("act_re_procdef表的key" + key);
+            String id1 = definition.getId();
+            System.out.println("流程定义id1:::" + id1);
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("act_re_procdef表的key", key);
+            map.put("act_re_procdef表的id", id1);
+            return map;
+        } catch (Exception e) {
+            logger.error("失败：部署工作流：" + e);
+            return null;
         }
     }
+```
 
-    /**
-     * 批准
-     * @param userId 任务ID
+controller层：
+
+```java
+ /**
+     * 部署流程
+     * */
+    @RequestMapping("/deploy")
+    public Map<String,Object> deploymentFlow(String filePath, String name){
+        return flowableService.deploymentFlow(filePath,name);
+    }
+```
+
+测试:http://localhost:8080/leave/deploy?filePath=processes/leave.bpmn20.xml&name=leave
+
+![1607926565383](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607926565383.png)
+
+#### 7.2启动流程：
+
+service层：
+
+```java
+/**
+     * 开始流程
      */
-    @RequestMapping(value = "apply")
-    @ResponseBody
-    public String apply(String userId) {
-        String taskId = getTaskId(userId);
+    public ProcessInstance startProcessInstance(String processKey, Map map) {
+        // 定义流程的key
+        // String processDefinitionKey = processKey;
+        if (StringUtils.isEmpty(processKey)) {
+            return null;
+        }
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey(processKey, map);
+
+        System.out.println("processInstanceId流程实例ID:" + pi.getId());
+        System.out.println("ProcessDefinitionId流程定义ID:" + pi.getProcessDefinitionId());
+        return pi;
+    }
+```
+
+controller层：
+
+```java
+/**
+     * 启动流程
+     * */
+    @RequestMapping("/start")
+    public Map<String, Object> startProcessInstance(String processKey, String userId){
+        Map<String, Object> map = new HashMap<>();
+        map.put("taskUser",userId);
+        ProcessInstance pi = flowableService.startProcessInstance(processKey, map);
+        Map<String, Object> pra = new HashMap<>();
+        pra.put("流程实例ID", pi.getId());
+        pra.put("流程定义ID:", pi.getProcessDefinitionId());
+        return pra;
+    }
+```
+
+测试：<http://localhost:8080/leave/start?processKey=Expense&userId=1234>
+
+![1607926948879](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607926948879.png)
+
+#### 7.3查看代办任务
+
+service层：
+
+```java
+    /**
+     * 查询代理人任务
+     */
+    public List<Task> queryAssigneeTask(String assignee) {
+        List<Task> tasks = taskService.createTaskQuery().taskAssignee(assignee).list();
+        return tasks;
+    }
+```
+
+controller层：
+
+```java
+    /**
+     * 查询代理人任务
+     * */
+    @RequestMapping("/queryTask")
+    public Map<String, Object> queryAssigneeTask(String assignee){
+        List<Task> tasks=flowableService.queryAssigneeTask(assignee);
+        Map<String, Object> map = new HashMap<>();
+        int i = 1 ;
+        for (Task task : tasks) {
+            map.put("task"+i,task.toString());
+            i++;
+        }
+        return map;
+    }
+```
+
+测试：<http://localhost:8080/leave/queryTask?assignee=1234>
+
+![1607927384934](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607927384934.png)
+
+
+
+#### 7.4提交请假申请：
+
+service层：
+
+```java
+    /**
+     * 完成任务
+     */
+    public boolean completeTask(String taskId, Map<String, Object> paras) {
+
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
-            return "此申请已通过或已驳回！";
+            logger.error("task:" + task);
+            return false;
         }
-        //通过审核
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("outcome", "通过");
-        taskService.complete(taskId, map);
-        return "已批准";
+
+        if (null == paras) {
+            taskService.complete(taskId);
+        } else {
+            taskService.complete(taskId, paras);
+        }
+
+        return true;
     }
+```
+
+controller层：
+
+```java
+/**
+    * 出差报销 
+    */
+    @RequestMapping("addLeave")
+    public String reimburse(String taskId, Integer money) {    
+    	Map<String, Object> map = new HashMap<>();    
+    	map.put("money", money);    
+    	try {        
+    		flowableService.completeTask(taskId, map);    
+    	} catch (Exception e) {        
+    		e.printStackTrace();       
+    		return "系统异常";    
+    	}    
+    	return "申请报销";
+    }
+```
+
+测试：http://localhost:8080/leave/addLeave?taskId=91541636-3dd4-11eb-a224-005056c00008&day=12
+
+![1607928291573](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607928291573.png)
 
 
+
+#### 7.5审核通过;
+
+service层：同上
+
+controller层：
+
+```java
+    /**
+     * 审核通过
+     * */
+    @RequestMapping("/pass")
+    @ResponseBody
+    public String pass(String taskId){
+        Map<String, Object> map = new HashMap<>();
+        map.put("outcome", "通过");
+        try {
+            flowableService.completeTask(taskId, map);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "系统异常";
+        }
+        return "审核通过";
+    }
+```
+
+测试：http://localhost:8080/leave/pass?taskId=91541636-3dd4-11eb-a224-005056c00008
+
+![1607928536998](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607928536998.png)
+
+#### 7.6驳回
+
+service层：同上
+
+controller层：
+
+```java
     /**
      * 驳回
-     * @param userId
-     * @return
-     */
+     * */
+    @RequestMapping("/rejectLeave")
     @ResponseBody
-    @RequestMapping(value = "reject")
-    public String reject(String userId) {
-        String taskId = getTaskId(userId);
-        HashMap<String, Object> map = new HashMap<>();
+    public String rejectLeave(String taskId){
+        Map<String, Object> map = new HashMap<>();
         map.put("outcome", "驳回");
-        taskService.complete(taskId, map);
-        return "被驳回";
+        try {
+            flowableService.completeTask(taskId, map);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "系统异常";
+        }
+        return "请假被驳回";
     }
-}
+
 ```
 
+#### 7.7查看流程图：
 
-
-### 8.添加两个代理类：
+service层：
 
 ```java
-package com.haiyang.flowable.listener;
-
-import org.flowable.engine.delegate.TaskListener;
-import org.flowable.task.service.delegate.DelegateTask;
-import org.springframework.stereotype.Component;
-@Component
-public class DeanTaskHandler implements TaskListener {
-    @Override
-    public void notify(DelegateTask delegateTask) {
-        delegateTask.setAssignee("院长");
+    /**
+     * 查看流程是否完成
+     */
+    public boolean isFinished(String processInstanceId) {
+        return historyService.createHistoricProcessInstanceQuery().finished()
+                .processInstanceId(processInstanceId).count() > 0;
     }
 
-}
+   /**
+     * 查看流程图
+     */
+    public void genProcessDiagram(HttpServletResponse httpServletResponse, String processId) {
+        /**
+         * 获得当前活动的节点
+         */
+        String processDefinitionId = "";
+        if (this.isFinished(processId)) {
+            // 如果流程已经结束，则得到结束节点
+            HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().processInstanceId(processId).singleResult();
 
+            processDefinitionId = pi.getProcessDefinitionId();
+        } else {
+            // 如果流程没有结束，则取当前活动节点
+            // 根据流程实例ID获得当前处于活动状态的ActivityId合集
+            ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(processId).singleResult();
+            processDefinitionId = pi.getProcessDefinitionId();
+        }
+        List<String> highLightedActivitis = new ArrayList<String>();
+
+        /**
+         * 获得活动的节点
+         */
+        List<HistoricActivityInstance> highLightedActivitList = historyService.createHistoricActivityInstanceQuery().processInstanceId(processId).orderByHistoricActivityInstanceStartTime().asc().list();
+
+        for (HistoricActivityInstance tempActivity : highLightedActivitList) {
+            String activityId = tempActivity.getActivityId();
+            highLightedActivitis.add(activityId);
+        }
+
+        List<String> flows = new ArrayList<>();
+
+        ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
+        //获取流程图
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
+        ProcessEngineConfiguration engconf = processEngine.getProcessEngineConfiguration();
+
+        ProcessDiagramGenerator diagramGenerator = engconf.getProcessDiagramGenerator();
+        InputStream in = diagramGenerator.generateDiagram(bpmnModel, "bmp", highLightedActivitis, flows, engconf.getActivityFontName(),
+                engconf.getLabelFontName(), engconf.getAnnotationFontName(), engconf.getClassLoader(), 1.0, true);
+        OutputStream out = null;
+        byte[] buf = new byte[1024];
+        int legth = 0;
+        try {
+            out = httpServletResponse.getOutputStream();
+            while ((legth = in.read(buf)) != -1) {
+                out.write(buf, 0, legth);
+            }
+        } catch (IOException e) {
+            logger.error("操作异常", e);
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 ```
 
-
+controller层：
 
 ```java
-package com.haiyang.flowable.listener;
-import org.flowable.engine.delegate.TaskListener;
-import org.flowable.task.service.delegate.DelegateTask;
-import org.springframework.stereotype.Component;
+   /**
+     * 查看流程图
+     */
+    @RequestMapping("/processDiagram")
+    public void genProcessDiagram(HttpServletResponse httpServletResponse, String processId) throws Exception {
+        flowableService.genProcessDiagram(httpServletResponse, processId);
+    }
+```
 
-@Component
-public class InstructorTaskHandler implements TaskListener {
+解决流程图中文乱码：
+
+```java
+package com.haiyang.flowable.config;
+
+
+import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @author WangChenyang
+ * date:  2020-12-14
+ * desc: flowable配置----为放置生成的流程图中中文乱码
+ */
+@Configuration
+public class FlowableConfig implements EngineConfigurationConfigurer<SpringProcessEngineConfiguration> {
+
 
     @Override
-    public void notify(DelegateTask delegateTask) {
-        delegateTask.setAssignee("辅导员");
+    public void configure(SpringProcessEngineConfiguration engineConfiguration) {
+        engineConfiguration.setActivityFontName("宋体");
+        engineConfiguration.setLabelFontName("宋体");
+        engineConfiguration.setAnnotationFontName("宋体");
     }
-
 }
+
 ```
 
 
 
-### 9.测试:
+测试：http://localhost:8080/leave/processDiagram?processId=d7f8661c-3dd9-11eb-92cc-005056c00008
 
-1.新建请假：在地址栏输入http://localhost:8080/leave/add?userId=1616&day=6
+![1607929535708](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607929535708.png)
 
-![1607667093759](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607667093759.png)
 
-2.通过：在地址栏输入http://localhost:8080/leave/apply?userId=1616
 
-![1607667175318](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607667175318.png)
+### 8.流程启动到结束数据库变化：
 
-3.驳回：在地址栏输入http://localhost:8080/leave/reject?userId=1717
+ 部署完毕后，act_re_deployment表中会有一条部署记录，记录这次部署的基本信息，然后是act_ge_bytearray表中有两条记录，记录的是本次上传的bpmn文件和对应的图片文件，每条记录都有act_re_deployment表的外键关联，然后是act_re_procdef表中有一条记录，记录的是该bpmn文件包含的基本信息，包含act_re_deployment表外键。
 
-![1607667456637](C:\Users\Coder Wang\AppData\Roaming\Typora\typora-user-images\1607667456637.png)
+流程启动，首先向act_ru_execution表中插入一条记录，记录的是这个流程定义的执行实例，其中id和proc_inst_id相同都是流程执行实例id，也就是本次执行这个流程定义的id，包含流程定义的id外键。
+
+然后向act_ru_task插入一条记录，记录的是第一个任务的信息，也就是开始执行第一个任务。包括act_ru_execution表中的execution_id外键和proc_inst_id外键，也就是本次执行实例id。
+
+然后向act_hi_procinst表和act_hi_taskinst表中各插入一条记录，记录的是本次执行实例和任务的历史记录：
+
+任务提交后，首先向act_ru_variable表中插入变量信息，包含本次流程执行实例的两个id外键，但不包括任务的id，因为setVariable方法设置的是全局变量，也就是整个流程都会有效的变量：
+
+当流程中的一个节点任务完成后，进入下一个节点任务，act_ru_task表中这个节点任务的记录被删除，插入新的节点任务的记录。
+
+同时act_ru_execution表中的记录并没有删除，而是将正在执行的任务变成新的节点任务。
+
+同时向act_hi_var_inst和act_hi_taskinst插入历史记录。
+
+整个流程执行完毕，act_ru_task，act_ru_execution和act_ru_variable表相关记录全被清空。
+
+全程有一个表一直在记录所有动作，就是act_hi_actinst表：
+
+以上就是flowable流程启动到结束的所有流程的变化。
+
+
+
+### 9.flowable中的五个引擎
+
+- 内容引擎 ContentEngine
+- 身份识别引擎 IdmEngine
+- 表单引擎 FormEngine
+- 决策引擎DmnEngine
+- 流程引擎 ProcessEngine
+
+1.**流程引擎 ProcessEngine**
+1.1 **RepositoryService
+
+管理流程定义
+
+1.2 **RuntimeService
+
+执行管理，包括启动、推进、删除流程实例等操作
+
+1.3 **TaskService
+
+任务管理
+
+1.4 **HistoryService
+
+历史管理(执行完的数据的管理)
+
+1.5 IdentityService
+
+组织机构管理
+
+1.6 FormService
+
+一个可选服务，任务表单管理
+
+1.7 ManagerService
+
+获取引擎所在的数据库中存在的表、获取表的元数据信息、创建删除等作业、执行命令类、执行自定义SQL、操作事件日志。
+
+1.8 DynamicBpmnService
+
+动态修改Bpmn流程定义以及部署库等操作。
+
+**2.内容引擎ContentEngine**
+
+2.1 内容引擎包含的服务有：ContentService和ContentManagementService。
+
+2.2 ContentManagementService提供对数据库表的管理操作。
+
+Map<String, Long> getTableCount(); 获取每个表的记录数量；
+String getTableName(Class<?> flowableEntityClass);根据实体类获得对应的数据库表名
+TableMetaData getTableMetaData(String tableName);根据实体类获得对应的数据库表名
+TablePageQuery createTablePageQuery();创建一个可以进行排序、根据条件分页的查询类
+**3.身份识别引擎 IdmEngine**
+
+身份识别引擎包含的服务有：IdmIdentityService、IdmManagementService、IdmEngineConfiguration。
+
+3.1 IdmIdentityService
+
+- 提供用户的创建、修改、删除、密码修改、登录、用户头像设置等；
+- 提供组Group的创建、删除、用户与组关系的关联、删除关联；
+- 提供权限的创建、删除、关联等.
+
+3.2 IdmManagementService
+
+对身份识别相关的数据库表进行统计、获取表的列信息。
+
+3.3 IdmEngineConfiguration
+
+提供数据库配置信息。
+
+**4.表单引擎 FormEngine**
+
+4.1 FormManagementService
+
+提供对数据库表的管理操作。
+
+4.2 FormRepositoryService
+
+表单资源服务。
+
+4.3 FormService
+
+提供表单实例的增删改查操作服务。
+
+**5.决策引擎DmnEngine**
+
+5.1 DmnManagementService
+
+该类主要用于获取一系列的数据表元数据信息。
+
+5.2 DmnRepositoryService
+
+动态部署流程资源。
+
+5.3 DmnRuleService
+
+按照规则启动流程实例。
+
+5.4 DmnHistoryService
+
+提供对决策执行历史的访问的服务。
