@@ -6,8 +6,8 @@ import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author haiyangp
- * date:  2018/4/7
+ * @author WangChenyang
+ * date:  2020-12-14
  * desc: flowable配置----为放置生成的流程图中中文乱码
  */
 @Configuration
